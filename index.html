@@ -129,7 +129,7 @@ function showWriting() {
     <p>Bitta mavzuni tanlang va inglizcha yozing:</p>
     <div class="opts" id="topics">${DATA.topics.map((t, i) =>
       `<button class="opt ${i === topic ? "pick" : ""}" data-t="${i}"><span class="ch">${i + 1}</span><span>${esc(t)}</span></button>`).join("")}</div></div>
-    <textarea id="w" maxlength="1200" placeholder="Write here in English..."></textarea>
+    <textarea id="w" maxlength="1200" placeholder="Bu yerga inglizcha yozing..."></textarea>
     <div class="count" id="cnt">0 / 1200</div>
     <button class="primary" id="done">Yakunlash</button>
     <p class="hint" style="margin-top:12px">Yozmasangiz ham bo'ladi, lekin yozsangiz o'qituvchi darajangizni aniqroq baholaydi.</p>`);

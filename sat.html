@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>SAT daraja testi</title>
+<script async src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root {
+    --bg: var(--tg-theme-bg-color, #f6f7fb);
+    --fg: var(--tg-theme-text-color, #14171f);
+    --hint: var(--tg-theme-hint-color, #7a8194);
+    --card: var(--tg-theme-secondary-bg-color, #ffffff);
+    --accent: var(--tg-theme-button-color, #3b82f6);
+    --accent-fg: var(--tg-theme-button-text-color, #ffffff);
+    --line: color-mix(in srgb, var(--fg) 12%, transparent);
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); }
+  body { font: 17px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; min-height: 100vh;
+         padding-bottom: env(safe-area-inset-bottom); }
+  header { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 12px 16px 8px; }
+  .bar { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
+  .bar > i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 4px; transition: width .3s; }
+  .meta { display: flex; justify-content: space-between; margin-top: 8px; font-size: 13px; color: var(--hint); }
+  main { max-width: 560px; margin: 0 auto; padding: 8px 16px 32px; animation: in .22s ease-out; }
+  @keyframes in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .card { background: var(--card); border-radius: var(--radius); padding: 18px; margin-bottom: 14px;
+          box-shadow: 0 1px 2px rgba(0,0,0,.05); }
+  h1 { font-size: 26px; line-height: 1.2; margin: 6px 0 14px; }
+  .tag { display: inline-block; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; font-weight: 600;
+         color: var(--accent); margin-bottom: 8px; }
+  .q { font-size: 22px; line-height: 1.35; font-weight: 650; margin: 0; }
+  .opts { display: grid; gap: 10px; margin-top: 4px; }
+  .opt { display: flex; gap: 12px; align-items: center; width: 100%; text-align: left; font: inherit;
+         padding: 15px 16px; min-height: 56px; background: var(--card); color: var(--fg);
+         border: 2px solid var(--line); border-radius: var(--radius); cursor: pointer; transition: transform .08s, border-color .1s; }
+  .opt:active, .opt.pick { border-color: var(--accent); transform: scale(.985); }
+  .opt .ch { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+             font-size: 14px; font-weight: 700; background: var(--line); color: var(--hint); }
+  .opt.pick .ch { background: var(--accent); color: var(--accent-fg); }
+  .skip { display: block; width: 100%; margin-top: 14px; padding: 14px; font: inherit; font-size: 16px;
+          color: var(--hint); background: none; border: 2px dashed var(--line); border-radius: var(--radius); cursor: pointer; }
+  .primary { display: block; width: 100%; padding: 17px; margin-top: 8px; background: var(--accent); color: var(--accent-fg);
+             border: 0; border-radius: var(--radius); font: inherit; font-weight: 650; font-size: 18px; cursor: pointer; }
+  .primary:active { transform: scale(.985); }
+  p { margin: 0 0 12px; } .hint { color: var(--hint); font-size: 15px; }
+  .passage { font-size: 17px; line-height: 1.6; }
+  details summary { cursor: pointer; color: var(--accent); font-size: 15px; margin-bottom: 4px; }
+  textarea { width: 100%; min-height: 180px; padding: 14px; font: inherit; color: var(--fg); background: var(--card);
+             border: 2px solid var(--line); border-radius: var(--radius); resize: vertical; }
+  textarea:focus { outline: none; border-color: var(--accent); }
+  .count { text-align: right; font-size: 13px; color: var(--hint); margin: 4px 2px 12px; }
+  .done { text-align: center; padding: 48px 8px; } .done .big { font-size: 56px; }
+</style>
+</head>
+<body>
+<header><div class="bar"><i id="prog"></i></div><div class="meta"><span id="where"></span><span id="clock">0:00</span></div></header>
+<main id="view"></main>
+<script>
+const DATA = {"q": [{"q": "The collection of ancient coins, along with several rare manuscripts, ___ on display at the museum this month.", "o": ["are", "is", "were", "be"]}, {"q": "Although the scientist's early results were promising, she remained ___ about drawing conclusions before the experiment was repeated.", "o": ["careless", "cautious", "enthusiastic", "indifferent"]}, {"q": "Which choice completes the sentence correctly? The museum's newest exhibit features three artists ___ Frida, Diego, and Lucia.", "o": ["artists,", "artists;", "artists:", "artists and"]}, {"q": "Maya trained every morning for six months. ___ she finished the marathon in under four hours.", "o": ["However,", "For example,", "As a result,", "In contrast,"]}, {"q": "Neither of the two candidates ___ prepared a full speech.", "o": ["have", "has", "are", "were"]}, {"q": "Which choice correctly joins the two clauses? The bakery opens at dawn ___ the first customers usually arrive by six.", "o": ["dawn, the first", "dawn; the first", "dawn the first", "dawn, which the first"]}, {"q": "The author's prose is deliberately ___: he avoids ornament and says exactly what he means in the fewest possible words.", "o": ["ornate", "spare", "ambiguous", "rambling"]}, {"q": "In a 2019 study, researchers found that city parks lowered residents' stress levels, but only when the parks were within a ten-minute walk of their homes. Parks farther away showed no measurable effect.\n\nWhich conclusion is best supported by the text?", "o": ["Any park reduces stress, regardless of distance.", "How close a park is affects whether it reduces stress.", "People who live far from parks are more stressed.", "Stress levels depend only on how much people walk."]}, {"q": "Bees communicate the location of food through a \"waggle dance,\" whose angle and duration indicate the direction and distance of the source. The dance is, in effect, a map delivered through movement.\n\nWhich choice best states the main idea of the text?", "o": ["Bees dance mainly for entertainment.", "Bees use movement to share precise information about food.", "Waggle dances are different in every bee species.", "Bees are unable to find food on their own."]}, {"q": "Walking along the shore at dawn, ___", "o": ["the sunrise looked spectacular to Daniel.", "Daniel found the sunrise spectacular.", "the sunrise was spectacular for Daniel's eyes.", "a spectacular sunrise was seen."]}, {"q": "Critics praised the novel's ___ structure, in which three storylines that seem unrelated gradually converge into one.", "o": ["fragmentary", "intricate", "monotonous", "static"]}, {"q": "Many commuters assume that driving is always faster than cycling in the city. ___ studies of rush-hour traffic show that cyclists often arrive first over short distances.", "o": ["Similarly,", "However,", "Consequently,", "For instance,"]}, {"q": "If 3x + 7 = 22, what is the value of x?", "o": ["3", "4", "5", "6"]}, {"q": "A shirt originally priced at $40 is on sale for 25% off. What is the sale price?", "o": ["$10", "$25", "$30", "$35"]}, {"q": "The ratio of boys to girls in a class is 3 : 5. If there are 24 students in total, how many are girls?", "o": ["9", "12", "15", "16"]}, {"q": "What is the slope of the line that passes through the points (2, 3) and (6, 11)?", "o": ["1", "2", "3", "4"]}, {"q": "If f(x) = 2x² − 3x + 1, what is f(3)?", "o": ["6", "8", "10", "12"]}, {"q": "The sum of two numbers is 20 and their difference is 6. What is the larger number?", "o": ["11", "12", "13", "14"]}, {"q": "The length of a rectangle is 4 more than twice its width. If the perimeter is 44, what is the width?", "o": ["5", "6", "8", "10"]}, {"q": "How many solutions does this system have?  y = 2x + 3  and  4x − 2y = −6", "o": ["None", "Exactly one", "Exactly two", "Infinitely many"]}], "rw": 12};
+const $ = (id) => document.getElementById(id);
+const view = $("view");
+const t0 = Date.now();
+setInterval(() => { const s = Math.floor((Date.now() - t0) / 1000);
+  $("clock").textContent = Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }, 1000);
+
+const PART = (new URLSearchParams(location.search).get("part") || "both");
+const RW = DATA.rw;
+const ITEMS = DATA.q.map((q, idx) => ({ ...q, idx, sec: idx < RW ? "rw" : "math" }))
+  .filter((q) => PART === "both" || q.sec === PART);
+const N = ITEMS.length;
+const NRW = ITEMS.filter((q) => q.sec === "rw").length;
+let ans = [], i = 0;
+const order = (n) => [...Array(n).keys()].sort(() => Math.random() - .5);
+const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])).replace(/\n/g, "<br>");
+const progress = (done, label) => { $("prog").style.width = (100 * done / N) + "%"; $("where").textContent = label; };
+const render = (html) => { view.style.animation = "none"; void view.offsetWidth; view.style.animation = ""; view.innerHTML = html; window.scrollTo(0, 0); };
+
+function intro() {
+  progress(0, "");
+  render(`<div class="card"><span class="tag">SAT daraja testi</span><h1>SAT darajangizni aniqlaymiz</h1>
+    <p>${PART === "rw" ? "SAT English (Reading &amp; Writing): 12 ta savol. Taxminan 9 daqiqa."
+        : PART === "math" ? "SAT Math: 8 ta savol. Taxminan 8 daqiqa."
+        : "20 ta savol: SAT English (12 ta) va SAT Math (8 ta). Taxminan 15 daqiqa."}</p>
+    <p>Savollar osondan qiyinga boradi. Oxirgilari qiyin bo'lishi tabiiy.</p>
+    <p class="hint"><b>Bilmasangiz, taxmin qilmang.</b> «Bilmayman» tugmasini bosing, natija aniqroq chiqadi. Kalkulyator va lug'atdan foydalanmang.</p></div>
+    <button class="primary" id="go">Boshlash</button>`);
+  $("go").onclick = show;
+}
+
+function show() {
+  if (i >= N) return finish();
+  const item = ITEMS[i];
+  const isRw = item.sec === "rw";
+  const sec = isRw ? "SAT English" : "SAT Math";
+  progress(i, `${sec} ${isRw ? i + 1 : i - NRW + 1}/${isRw ? NRW : N - NRW}`);
+  render(`<div class="card"><span class="tag">${sec} · Savol ${i + 1}</span><p class="q">${esc(item.q)}</p></div>
+    <div class="opts">` + order(item.o.length).map((k, pos) =>
+      `<button class="opt" data-i="${k}"><span class="ch">${"ABCD"[pos]}</span><span>${esc(item.o[k])}</span></button>`).join("") +
+    `</div><button class="skip" data-i="-1">Bilmayman</button>`);
+  view.querySelectorAll("[data-i]").forEach((b) => (b.onclick = () => {
+    b.classList.add("pick");
+    setTimeout(() => { ans[i] = parseInt(b.dataset.i, 10); i++; show(); }, 140);
+  }));
+}
+
+function finish() {
+  const payload = { test: "sat", part: PART, a: ans, t: Math.floor((Date.now() - t0) / 1000) };
+  progress(N, "Tayyor");
+  // Keyboard-button launches have NO initData, so detect Telegram by platform instead.
+  const tg = window.Telegram && window.Telegram.WebApp;
+  if (tg && tg.platform && tg.platform !== "unknown") {
+    render(`<div class="done"><div class="big">✅</div><h1>Rahmat!</h1><p>Natijalar yuborilmoqda...</p></div>`);
+    tg.sendData(JSON.stringify(payload));
+  } else {
+    render(`<div class="done"><div class="big">📱</div><h1>Testni Telegram orqali oching</h1>
+      <p class="hint">Natija botga yuborilishi uchun testni bot ichidagi «📝 SAT testini boshlash» tugmasi orqali oching.</p></div>`);
+  }
+}
+
+const tgw = window.Telegram && window.Telegram.WebApp;
+if (tgw) { try { tgw.ready(); tgw.expand(); } catch (e) {} }
+const h = location.hash;  // debug jump: #q
+if (h === "#q") { i = Math.min(12, N - 1); show(); } else intro();
+window.addEventListener("load", () => { const t = window.Telegram && window.Telegram.WebApp; if (t) { try { t.ready(); t.expand(); } catch (e) {} } });
+</script>
+</body>
+</html>
