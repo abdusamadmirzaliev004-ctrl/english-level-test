@@ -7,52 +7,68 @@
 <script async src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   :root {
-    --bg: var(--tg-theme-bg-color, #f6f7fb);
-    --fg: var(--tg-theme-text-color, #14171f);
-    --hint: var(--tg-theme-hint-color, #7a8194);
-    --card: var(--tg-theme-secondary-bg-color, #ffffff);
-    --accent: var(--tg-theme-button-color, #3b82f6);
+    color-scheme: light dark;
+    --bg: var(--tg-theme-bg-color, #ffffff);
+    --fg: var(--tg-theme-text-color, #111113);
+    --hint: var(--tg-theme-hint-color, #86868b);
+    --fill: var(--tg-theme-secondary-bg-color, #f2f2f7);
+    --accent: var(--tg-theme-button-color, #0a84ff);
     --accent-fg: var(--tg-theme-button-text-color, #ffffff);
-    --line: color-mix(in srgb, var(--fg) 12%, transparent);
-    --radius: 16px;
+    --line: color-mix(in srgb, var(--fg) 10%, transparent);
+    --r: 16px;
+    --ease: cubic-bezier(.2, .8, .2, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: var(--tg-theme-bg-color, #000000); --fg: var(--tg-theme-text-color, #f5f5f7);
+            --fill: var(--tg-theme-secondary-bg-color, #1c1c1e); --hint: var(--tg-theme-hint-color, #98989f); }
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; background: var(--bg); color: var(--fg); }
-  body { font: 17px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; min-height: 100vh;
-         padding-bottom: env(safe-area-inset-bottom); }
-  header { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 12px 16px 8px; }
-  .bar { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
-  .bar > i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 4px; transition: width .3s; }
-  .meta { display: flex; justify-content: space-between; margin-top: 8px; font-size: 13px; color: var(--hint); }
-  main { max-width: 560px; margin: 0 auto; padding: 8px 16px 32px; animation: in .22s ease-out; }
-  @keyframes in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-  .card { background: var(--card); border-radius: var(--radius); padding: 18px; margin-bottom: 14px;
-          box-shadow: 0 1px 2px rgba(0,0,0,.05); }
-  h1 { font-size: 26px; line-height: 1.2; margin: 6px 0 14px; }
-  .tag { display: inline-block; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; font-weight: 600;
-         color: var(--accent); margin-bottom: 8px; }
-  .q { font-size: 22px; line-height: 1.35; font-weight: 650; margin: 0; }
+  body { font: 17px/1.47 -apple-system, "SF Pro Text", system-ui, "Segoe UI", Roboto, sans-serif; letter-spacing: -.011em;
+         -webkit-font-smoothing: antialiased; min-height: 100vh; padding-bottom: env(safe-area-inset-bottom); }
+  header { position: sticky; top: 0; z-index: 5; padding: 12px 20px 10px;
+           background: color-mix(in srgb, var(--bg) 78%, transparent);
+           -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); }
+  .bar { height: 3px; background: var(--line); border-radius: 2px; overflow: hidden; }
+  .bar > i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 2px; transition: width .5s var(--ease); }
+  .meta { display: flex; justify-content: space-between; margin-top: 8px; font-size: 13px; color: var(--hint);
+          font-variant-numeric: tabular-nums; min-height: 18px; }
+  main { max-width: 560px; margin: 0 auto; padding: 20px 20px 40px; animation: in .38s var(--ease); }
+  @keyframes in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  .card { padding: 0 0 22px; margin: 0; }
+  .tag { display: block; font-size: 13px; font-weight: 600; letter-spacing: .02em; color: var(--hint); margin-bottom: 10px; }
+  h1 { font-size: 34px; line-height: 1.08; letter-spacing: -.03em; font-weight: 700; margin: 0 0 14px; }
+  .q { font-size: 26px; line-height: 1.22; letter-spacing: -.022em; font-weight: 600; margin: 0; }
   .opts { display: grid; gap: 10px; margin-top: 4px; }
-  .opt { display: flex; gap: 12px; align-items: center; width: 100%; text-align: left; font: inherit;
-         padding: 15px 16px; min-height: 56px; background: var(--card); color: var(--fg);
-         border: 2px solid var(--line); border-radius: var(--radius); cursor: pointer; transition: transform .08s, border-color .1s; }
-  .opt:active, .opt.pick { border-color: var(--accent); transform: scale(.985); }
-  .opt .ch { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
-             font-size: 14px; font-weight: 700; background: var(--line); color: var(--hint); }
-  .opt.pick .ch { background: var(--accent); color: var(--accent-fg); }
-  .skip { display: block; width: 100%; margin-top: 14px; padding: 14px; font: inherit; font-size: 16px;
-          color: var(--hint); background: none; border: 2px dashed var(--line); border-radius: var(--radius); cursor: pointer; }
-  .primary { display: block; width: 100%; padding: 17px; margin-top: 8px; background: var(--accent); color: var(--accent-fg);
-             border: 0; border-radius: var(--radius); font: inherit; font-weight: 650; font-size: 18px; cursor: pointer; }
-  .primary:active { transform: scale(.985); }
+  .opt { display: flex; gap: 14px; align-items: center; width: 100%; text-align: left; font: inherit; color: var(--fg);
+         padding: 15px 18px; min-height: 58px; background: var(--fill); border: 0; border-radius: var(--r); cursor: pointer;
+         transition: transform .2s var(--ease), background .15s, color .15s; }
+  .opt:active { transform: scale(.98); }
+  .opt .ch { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 13px;
+             font-weight: 600; background: color-mix(in srgb, var(--fg) 8%, transparent); color: var(--hint); transition: inherit; }
+  .opt.pick { background: var(--accent); color: var(--accent-fg); }
+  .opt.pick .ch { background: rgba(255,255,255,.25); color: var(--accent-fg); }
+  .skip { display: block; width: 100%; margin-top: 8px; padding: 16px; font: inherit; font-size: 16px; color: var(--hint);
+          background: none; border: 0; border-radius: var(--r); cursor: pointer; transition: opacity .15s; }
+  .skip:active { opacity: .5; }
+  .primary { display: block; width: 100%; padding: 17px; margin-top: 12px; background: var(--accent); color: var(--accent-fg);
+             border: 0; border-radius: var(--r); font: inherit; font-weight: 600; font-size: 17px; cursor: pointer;
+             transition: transform .2s var(--ease), opacity .15s; }
+  .primary:active { transform: scale(.98); opacity: .9; }
   p { margin: 0 0 12px; } .hint { color: var(--hint); font-size: 15px; }
   .passage { font-size: 17px; line-height: 1.6; }
-  details summary { cursor: pointer; color: var(--accent); font-size: 15px; margin-bottom: 4px; }
-  textarea { width: 100%; min-height: 180px; padding: 14px; font: inherit; color: var(--fg); background: var(--card);
-             border: 2px solid var(--line); border-radius: var(--radius); resize: vertical; }
-  textarea:focus { outline: none; border-color: var(--accent); }
-  .count { text-align: right; font-size: 13px; color: var(--hint); margin: 4px 2px 12px; }
-  .done { text-align: center; padding: 48px 8px; } .done .big { font-size: 56px; }
+  details summary { cursor: pointer; color: var(--accent); font-size: 15px; margin-bottom: 8px; }
+  textarea { width: 100%; min-height: 180px; padding: 16px; font: inherit; color: var(--fg); background: var(--fill);
+             border: 0; border-radius: var(--r); resize: vertical; }
+  textarea:focus { outline: 2px solid var(--accent); }
+  .count { text-align: right; font-size: 13px; color: var(--hint); margin: 6px 4px 12px; font-variant-numeric: tabular-nums; }
+  .done { text-align: center; padding: 72px 8px; }
+  .check { width: 72px; height: 72px; margin-bottom: 18px; }
+  .check circle { fill: var(--accent); }
+  .check path { fill: none; stroke: var(--accent-fg); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round;
+                stroke-dasharray: 40; stroke-dashoffset: 40; animation: draw .5s .15s var(--ease) forwards; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @media (prefers-reduced-motion: reduce) { * { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 </style>
 </head>
 <body>
@@ -72,6 +88,8 @@ const ITEMS = DATA.q.map((q, idx) => ({ ...q, idx, sec: idx < RW ? "rw" : "math"
   .filter((q) => PART === "both" || q.sec === PART);
 const N = ITEMS.length;
 const NRW = ITEMS.filter((q) => q.sec === "rw").length;
+const haptic = () => { try { window.Telegram.WebApp.HapticFeedback.selectionChanged(); } catch (e) {} };
+let locked = false;  // one tap per question: a double tap must not skip ahead
 let ans = [], i = 0;
 const order = (n) => [...Array(n).keys()].sort(() => Math.random() - .5);
 const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])).replace(/\n/g, "<br>");
@@ -80,12 +98,11 @@ const render = (html) => { view.style.animation = "none"; void view.offsetWidth;
 
 function intro() {
   progress(0, "");
-  render(`<div class="card"><span class="tag">SAT daraja testi</span><h1>SAT darajangizni aniqlaymiz</h1>
+  render(`<div class="card"><span class="tag">SAT daraja testi</span><h1>Darajangizni aniqlaymiz</h1>
     <p>${PART === "rw" ? "SAT English (Reading &amp; Writing): 12 ta savol. Taxminan 9 daqiqa."
         : PART === "math" ? "SAT Math: 8 ta savol. Taxminan 8 daqiqa."
         : "20 ta savol: SAT English (12 ta) va SAT Math (8 ta). Taxminan 15 daqiqa."}</p>
-    <p>Savollar osondan qiyinga boradi. Oxirgilari qiyin bo'lishi tabiiy.</p>
-    <p class="hint"><b>Bilmasangiz, taxmin qilmang.</b> «Bilmayman» tugmasini bosing, natija aniqroq chiqadi. Kalkulyator va lug'atdan foydalanmang.</p></div>
+    <p class="hint">Bilmasangiz, «Bilmayman»ni bosing. Taxmin qilmang. Kalkulyator va lug'atsiz.</p></div>
     <button class="primary" id="go">Boshlash</button>`);
   $("go").onclick = show;
 }
@@ -100,9 +117,11 @@ function show() {
     <div class="opts">` + order(item.o.length).map((k, pos) =>
       `<button class="opt" data-i="${k}"><span class="ch">${"ABCD"[pos]}</span><span>${esc(item.o[k])}</span></button>`).join("") +
     `</div><button class="skip" data-i="-1">Bilmayman</button>`);
+  locked = false;
   view.querySelectorAll("[data-i]").forEach((b) => (b.onclick = () => {
+    if (locked) return; locked = true; haptic();
     b.classList.add("pick");
-    setTimeout(() => { ans[i] = parseInt(b.dataset.i, 10); i++; show(); }, 140);
+    setTimeout(() => { ans[i] = parseInt(b.dataset.i, 10); i++; show(); }, 160);
   }));
 }
 
@@ -112,10 +131,10 @@ function finish() {
   // Keyboard-button launches have NO initData, so detect Telegram by platform instead.
   const tg = window.Telegram && window.Telegram.WebApp;
   if (tg && tg.platform && tg.platform !== "unknown") {
-    render(`<div class="done"><div class="big">✅</div><h1>Rahmat!</h1><p>Natijalar yuborilmoqda...</p></div>`);
+    render(`<div class="done"><svg class="check" viewBox="0 0 72 72"><circle cx="36" cy="36" r="36"/><path d="M21 37l11 11 20-23"/></svg><h1>Rahmat</h1><p class="hint">Natijalar yuborilmoqda...</p></div>`);
     tg.sendData(JSON.stringify(payload));
   } else {
-    render(`<div class="done"><div class="big">📱</div><h1>Testni Telegram orqali oching</h1>
+    render(`<div class="done"><h1>Testni Telegram orqali oching</h1>
       <p class="hint">Natija botga yuborilishi uchun testni bot ichidagi «📝 SAT testini boshlash» tugmasi orqali oching.</p></div>`);
   }
 }
